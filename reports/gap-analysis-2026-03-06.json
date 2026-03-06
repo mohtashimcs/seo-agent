@@ -1,0 +1,40 @@
+{
+  "date": "2026-03-06",
+  "site_url": "https://mikefutia.com/",
+  "total_gap_keywords": 2,
+  "top_opportunity": {
+    "keyword": "futia",
+    "impressions": 19,
+    "position": 13.6,
+    "clicks": 0,
+    "ctr": 0,
+    "rec_type": "NO_PAGE",
+    "recommendation": "New article opportunity. No page is capturing clicks for this query. A dedicated post targeting this exact phrase could land page 1 within 30\u201360 days."
+  },
+  "keywords": [
+    {
+      "keyword": "futia",
+      "impressions": 19,
+      "position": 13.6,
+      "clicks": 0,
+      "ctr": 0,
+      "rec_type": "NO_PAGE",
+      "recommendation": "New article opportunity. No page is capturing clicks for this query. A dedicated post targeting this exact phrase could land page 1 within 30\u201360 days."
+    },
+    {
+      "keyword": "n8n nano banana template",
+      "impressions": 3,
+      "position": 11.3,
+      "clicks": 0,
+      "ctr": 0,
+      "rec_type": "NO_PAGE",
+      "recommendation": "New article opportunity. No page is capturing clicks for this query. A dedicated post targeting this exact phrase could land page 1 within 30\u201360 days."
+    }
+  ],
+  "kpis": {
+    "total_impressions": 620,
+    "gap_zone_count": 2,
+    "avg_position": 17.7,
+    "total_clicks": 156
+  }
+}

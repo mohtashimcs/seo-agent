@@ -1,0 +1,69 @@
+{
+  "date": "2026-03-06",
+  "keywords_analyzed": 2,
+  "results": [
+    {
+      "keyword": "futia",
+      "competitor": "en.wiktionary.org",
+      "url": "https://en.wiktionary.org/wiki/futia",
+      "threat": "MEDIUM",
+      "reason": "Wiktionary is ranking for the word 'futia' as a Finnish/Swahili verb definition. High domain authority but irrelevant content — Google is showing it because no strong branded page exists. Fix: create a clear branded homepage or about page with 'Futia' prominently in title, H1, and schema markup."
+    },
+    {
+      "keyword": "futia",
+      "competitor": "mfutia.github.io",
+      "url": "https://mfutia.github.io/About.html",
+      "threat": "LOW",
+      "reason": "Academic personal page for a researcher named Matt Futia. Thin content with no SEO optimization. Ranking on name match alone. Beatable with one well-structured branded page."
+    },
+    {
+      "keyword": "futia",
+      "competitor": "futia.edu.ng",
+      "url": "https://futia.edu.ng/programme-list/",
+      "threat": "HIGH",
+      "reason": "Federal University of Technology Ikot Abasi (FUTIA) — institutional domain with massive authority and exact brand match. Not beatable on the acronym. Fix: differentiate by targeting 'Mike Futia' or 'Futia AI' as your branded query instead."
+    },
+    {
+      "keyword": "n8n nano banana template",
+      "competitor": "n8n.io",
+      "url": "https://n8n.io/workflows/8375-generate-ai-images-with-text-prompts-using-bananaapi-and-nano-banana-engine/",
+      "threat": "HIGH",
+      "reason": "n8n.io owns the template marketplace — they host the actual workflow templates. DR 80+ domain with exact-match content. You cannot outrank them for their own template pages. Fix: target a review/tutorial angle like 'n8n Nano Banana template tutorial' or 'best n8n AI image workflows 2026' instead."
+    },
+    {
+      "keyword": "n8n nano banana template",
+      "competitor": "n8n.io",
+      "url": "https://n8n.io/workflows/8082-nano-banana-ai-image-editor-via-telegram/",
+      "threat": "HIGH",
+      "reason": "Second n8n.io template page occupying another SERP slot. They own positions 1-3 for this query. Going head-to-head is futile. Fix: create a comparison or tutorial post that links to these templates while targeting long-tail variations."
+    },
+    {
+      "keyword": "n8n nano banana template",
+      "competitor": "reddit.com/r/n8n",
+      "url": "https://www.reddit.com/r/n8n/comments/1n8b3cr/one_image_one_hundred_ads_zero_dollars_nano/",
+      "threat": "MEDIUM",
+      "reason": "Reddit discussion thread ranking on community engagement. Content is user-generated and not deeply optimized. Fix: a comprehensive tutorial post with screenshots and step-by-step instructions would provide more value than a Reddit thread."
+    }
+  ],
+  "quick_wins": [
+    {
+      "keyword": "futia",
+      "competitor": "mfutia.github.io",
+      "url": "https://mfutia.github.io/About.html",
+      "threat": "LOW",
+      "reason": "Academic personal page for a researcher named Matt Futia. Thin content with no SEO optimization. Ranking on name match alone. Beatable with one well-structured branded page."
+    }
+  ],
+  "avoid_list": [
+    {
+      "keyword": "futia",
+      "competitor": "futia.edu.ng",
+      "reason": "Federal University of Technology Ikot Abasi (FUTIA) — institutional domain with exact brand match. Target 'Mike Futia' or 'Futia AI' instead."
+    },
+    {
+      "keyword": "n8n nano banana template",
+      "competitor": "n8n.io",
+      "reason": "n8n.io owns the template marketplace with DR 80+ and exact-match content. Target tutorial/review angles instead."
+    }
+  ]
+}

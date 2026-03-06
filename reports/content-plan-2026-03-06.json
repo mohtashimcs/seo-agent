@@ -1,0 +1,41 @@
+{
+  "date": "2026-03-06",
+  "articles": [
+    {
+      "priority": "P1",
+      "title": "How to Generate AI Images with n8n and Nano Banana Pro (Step-by-Step Template)",
+      "keyword": "n8n nano banana template",
+      "estimated_volume": 3,
+      "current_position": 11.3,
+      "intent": "How-To",
+      "brief": "Tutorial-style post walking through your Pro template step by step. n8n.io owns the template listings but not the tutorial SERP — lead with a real output example, show the workflow screenshot, compare Nano Banana pricing to alternatives, and link to the template. Target long-tail: 'n8n AI image workflow tutorial'."
+    },
+    {
+      "priority": "P1",
+      "title": "5 Claude Code Automations I Use Every Week (With Prompts)",
+      "keyword": "claude code automations",
+      "estimated_volume": 0,
+      "current_position": null,
+      "intent": "How-To",
+      "brief": "Net-new content play — no existing ranking but high topical relevance to your brand. Show 5 real Claude Code workflows you actually run (SEO, code gen, data pipelines). Include exact prompts and outputs. This builds topical authority for 'claude code' keyword cluster and positions you as a practitioner, not a reviewer."
+    },
+    {
+      "priority": "P2",
+      "title": "Mike Futia — AI Automation Systems for DTC Brands",
+      "keyword": "mike futia",
+      "estimated_volume": 19,
+      "current_position": 13.6,
+      "intent": "Informational",
+      "brief": "Branded landing page optimized for 'Mike Futia' (not generic 'futia' — the university owns that). Include name in title, H1, URL slug, and schema markup. Add sections: what you do, recent projects, featured templates. This is a quick win — one page displaces the GitHub academic profile currently ranking."
+    },
+    {
+      "priority": "P2",
+      "title": "Nano Banana vs Flux vs DALL-E: Cheapest AI Image API for Automations (2026)",
+      "keyword": "nano banana api pricing",
+      "estimated_volume": 0,
+      "current_position": null,
+      "intent": "Commercial Investigation",
+      "brief": "Comparison post targeting buyers evaluating AI image APIs for automation workflows. Lead with a pricing table above the fold (Google AI Overview bait). Include real cost-per-image data from your n8n runs. This captures commercial intent traffic that n8n.io's template pages don't address."
+    }
+  ]
+}
