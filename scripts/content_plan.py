@@ -27,9 +27,9 @@ def classify_intent(keyword):
     kw = keyword.lower()
     if any(w in kw for w in ["how to", "how do", "tutorial", "guide", "steps", "setup"]):
         return "How-To"
-    elif any(w in kw for w in ["best", "top", "vs", "versus", "compare", "alternative", "review"]):
+    elif any(w in kw for w in ["best", "top", "vs", "versus", "compare", "alternative", "review", "companies", "providers"]):
         return "Commercial Investigation"
-    elif any(w in kw for w in ["buy", "price", "cost", "cheap", "discount", "deal"]):
+    elif any(w in kw for w in ["buy", "for sale", "price", "cost", "cheap", "discount", "deal"]):
         return "Transactional"
     else:
         return "Informational"
@@ -42,19 +42,16 @@ def generate_title(keyword, intent, brand_context=""):
 
     title_templates = {
         "How-To": [
-            f"How to {kw_title}: The Exact System I Use for DTC Clients ({current_year})",
-            f"{kw_title}: A Step-by-Step Guide for DTC Brands and Agencies",
+            f"How to {kw_title}: A Step-by-Step Guide",
         ],
         "Commercial Investigation": [
-            f"Best {kw_title} Tools for DTC Brands: Honest Comparison ({current_year})",
-            f"{kw_title}: What Actually Works (And What's a Waste of Money)",
+            f"{kw_title}: What to Compare and What to Ask Before You Choose",
         ],
         "Transactional": [
-            f"{kw_title}: What to Look For Before You Buy ({current_year})",
+            f"{kw_title}: What to Check Before You Buy ({current_year})",
         ],
         "Informational": [
-            f"{kw_title}: The Complete Guide for DTC Brands and Agencies ({current_year})",
-            f"What Is {kw_title}? A Practical Breakdown for E-Comm Teams",
+            f"{kw_title}: How It Works and Who It May Not Help",
         ],
     }
 
@@ -65,7 +62,7 @@ def generate_title(keyword, intent, brand_context=""):
 def generate_brief(keyword, intent, position, competitive_context=""):
     """Generate a one-sentence brief for the article."""
     briefs = {
-        "How-To": f"Step-by-step walkthrough targeting DTC operators — lead with the outcome in the first paragraph, include a real workflow example from client work, and close with a downloadable template CTA.",
+        "How-To": f"Step-by-step walkthrough — explain the mechanism before the benefit, include a real example with dates, and state limitations near the top.",
         "Commercial Investigation": f"Neutral comparison post with a structured table above the fold — Google AI Overview pulls from tables, and this keyword has commercial intent buyers ready to act.",
         "Transactional": f"Buying guide with specific criteria and a strong recommendation — readers are evaluating options and need a clear point of view to convert.",
         "Informational": f"Definitive resource page targeting this keyword cluster — build topical authority by covering the full topic, then link out to supporting how-to posts.",
@@ -93,6 +90,11 @@ def run_content_plan():
 
     keywords = gap_data.get("keywords", [])[:8]
 
+    # Ignore demo data from competitor_intel.py's no-API fallback
+    if comp_data and all(r["competitor"].startswith("competitor-") for r in comp_data.get("results", [])):
+        print("⚠️  Competitive report is placeholder data — ignoring it.")
+        comp_data = None
+
     # Build competitive threat lookup
     threat_lookup = {}
     if comp_data:
@@ -117,7 +119,7 @@ def run_content_plan():
 
         # Skip HIGH threat on exact keyword — suggest alternative angle
         if threat == "HIGH":
-            keyword = f"{keyword} for DTC brands"  # reframe as niche angle
+            keyword = f"{keyword} explained"  # reframe as a related angle
 
         scored.append({
             "keyword": keyword,
@@ -162,12 +164,13 @@ def run_content_plan():
 
     md_path = reports_dir / f"content-plan-{today}.md"
     with open(md_path, "w") as f:
-        f.write(f"# Weekly Content Plan\n")
-        f.write(f"**Date:** {today} | **Generated from:** gap analysis + competitive intel\n\n")
+        sources_note = " + competitive intel" if comp_data else " (competitive intel unavailable)"
+        f.write("# Weekly Content Plan\n")
+        f.write(f"**Date:** {today} | **Generated from:** gap analysis{sources_note}\n\n")
         for article in plan:
             f.write(f"## {article['priority']} — {article['title']}\n")
             f.write(f"- **Target keyword:** {article['keyword']}\n")
-            f.write(f"- **Est. volume:** {article['estimated_volume']:,} impressions/mo\n")
+            f.write(f"- **Est. volume:** {article['estimated_volume']:,} impressions (90 days)\n")
             f.write(f"- **Current position:** {article['current_position']}\n")
             f.write(f"- **Intent:** {article['intent']}\n")
             f.write(f"- **Brief:** {article['brief']}\n\n")

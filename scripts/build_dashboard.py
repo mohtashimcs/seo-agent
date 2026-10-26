@@ -51,6 +51,9 @@ def build_dashboard():
     kpis = gap.get("kpis", {}) if gap else {}
     keywords = gap.get("keywords", []) if gap else []
     comp_results = comp.get("results", []) if comp else []
+    # Ignore demo data from competitor_intel.py's no-API fallback
+    if all(r["competitor"].startswith("competitor-") for r in comp_results):
+        comp_results = []
     articles = plan.get("articles", []) if plan else []
 
     # ── KPI values ────────────────────────────────────────────────────────
@@ -105,6 +108,9 @@ def build_dashboard():
           <td style="padding:13px 20px;border-bottom:1px solid #1e2530">{badge}</td>
           <td style="font-size:11px;color:#4a5568;padding:13px 20px;border-bottom:1px solid #1e2530;max-width:280px">{r['reason']}</td>
         </tr>"""
+
+    if not comp_rows_html:
+        comp_rows_html = '<tr><td colspan="4" style="font-size:12px;color:#4a5568;padding:20px">Competitor data unavailable this week (no SERP API configured).</td></tr>'
 
     # ── Content plan cards HTML ───────────────────────────────────────────
     content_cards_html = ""

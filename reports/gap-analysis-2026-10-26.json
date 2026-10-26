@@ -1,0 +1,112 @@
+{
+  "date": "2026-10-26",
+  "site_url": "sc-domain:ezecreditservices.com",
+  "total_gap_keywords": 412,
+  "top_opportunity": {
+    "keyword": "buy tradelines",
+    "impressions": 5619,
+    "position": 10.6,
+    "clicks": 54,
+    "ctr": 1.0,
+    "rec_type": "NEEDS_HUB",
+    "recommendation": "Add a hub page. Short-tail keyword suggests you're ranking for multiple variations without a central article consolidating authority. One hub page can push all variations higher."
+  },
+  "keywords": [
+    {
+      "keyword": "buy tradelines",
+      "impressions": 5619,
+      "position": 10.6,
+      "clicks": 54,
+      "ctr": 1.0,
+      "rec_type": "NEEDS_HUB",
+      "recommendation": "Add a hub page. Short-tail keyword suggests you're ranking for multiple variations without a central article consolidating authority. One hub page can push all variations higher."
+    },
+    {
+      "keyword": "tradelines for sale",
+      "impressions": 5033,
+      "position": 11.1,
+      "clicks": 304,
+      "ctr": 6.0,
+      "rec_type": "WEAK_TITLE",
+      "recommendation": "Improve content depth. Review the top 3 ranking pages and identify what they cover that you don't. Adding a comparison table or FAQ section often pushes mid-range positions to top 5."
+    },
+    {
+      "keyword": "authorized user tradelines",
+      "impressions": 1156,
+      "position": 12.6,
+      "clicks": 28,
+      "ctr": 2.4,
+      "rec_type": "NO_INTERNAL_LINKS",
+      "recommendation": "Add internal links. High impressions but deep ranking suggests the page isn't getting enough internal authority. Add 3\u20135 links from your highest-traffic posts."
+    },
+    {
+      "keyword": "best tradeline companies",
+      "impressions": 787,
+      "position": 11.6,
+      "clicks": 54,
+      "ctr": 6.9,
+      "rec_type": "WEAK_TITLE",
+      "recommendation": "Improve content depth. Review the top 3 ranking pages and identify what they cover that you don't. Adding a comparison table or FAQ section often pushes mid-range positions to top 5."
+    },
+    {
+      "keyword": "primary tradelines for sale",
+      "impressions": 667,
+      "position": 10.5,
+      "clicks": 30,
+      "ctr": 4.5,
+      "rec_type": "WEAK_TITLE",
+      "recommendation": "Improve content depth. Review the top 3 ranking pages and identify what they cover that you don't. Adding a comparison table or FAQ section often pushes mid-range positions to top 5."
+    },
+    {
+      "keyword": "tradeline for sale",
+      "impressions": 642,
+      "position": 10.4,
+      "clicks": 24,
+      "ctr": 3.7,
+      "rec_type": "WEAK_TITLE",
+      "recommendation": "Improve content depth. Review the top 3 ranking pages and identify what they cover that you don't. Adding a comparison table or FAQ section often pushes mid-range positions to top 5."
+    },
+    {
+      "keyword": "au tradelines",
+      "impressions": 576,
+      "position": 10.7,
+      "clicks": 18,
+      "ctr": 3.1,
+      "rec_type": "NEEDS_HUB",
+      "recommendation": "Add a hub page. Short-tail keyword suggests you're ranking for multiple variations without a central article consolidating authority. One hub page can push all variations higher."
+    },
+    {
+      "keyword": "tradeline companies",
+      "impressions": 564,
+      "position": 9.1,
+      "clicks": 41,
+      "ctr": 7.3,
+      "rec_type": "NEEDS_HUB",
+      "recommendation": "Add a hub page. Short-tail keyword suggests you're ranking for multiple variations without a central article consolidating authority. One hub page can push all variations higher."
+    },
+    {
+      "keyword": "authorized user tradelines for sale",
+      "impressions": 549,
+      "position": 13.3,
+      "clicks": 20,
+      "ctr": 3.6,
+      "rec_type": "NO_INTERNAL_LINKS",
+      "recommendation": "Add internal links. High impressions but deep ranking suggests the page isn't getting enough internal authority. Add 3\u20135 links from your highest-traffic posts."
+    },
+    {
+      "keyword": "credit tradelines for sale",
+      "impressions": 483,
+      "position": 10.4,
+      "clicks": 20,
+      "ctr": 4.1,
+      "rec_type": "WEAK_TITLE",
+      "recommendation": "Improve content depth. Review the top 3 ranking pages and identify what they cover that you don't. Adding a comparison table or FAQ section often pushes mid-range positions to top 5."
+    }
+  ],
+  "kpis": {
+    "total_impressions": 58759,
+    "gap_zone_count": 412,
+    "avg_position": 21.7,
+    "total_clicks": 1727
+  }
+}

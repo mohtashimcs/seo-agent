@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-26",
+  "articles": [
+    {
+      "priority": "P1",
+      "title": "Buy Tradelines: What to Check Before You Buy (2026)",
+      "keyword": "buy tradelines",
+      "estimated_volume": 5619,
+      "current_position": 10.6,
+      "intent": "Transactional",
+      "brief": "Buying guide with specific criteria and a strong recommendation \u2014 readers are evaluating options and need a clear point of view to convert."
+    },
+    {
+      "priority": "P1",
+      "title": "Tradelines For Sale: What to Check Before You Buy (2026)",
+      "keyword": "tradelines for sale",
+      "estimated_volume": 5033,
+      "current_position": 11.1,
+      "intent": "Transactional",
+      "brief": "Buying guide with specific criteria and a strong recommendation \u2014 readers are evaluating options and need a clear point of view to convert."
+    },
+    {
+      "priority": "P2",
+      "title": "Authorized User Tradelines: How It Works and Who It May Not Help",
+      "keyword": "authorized user tradelines",
+      "estimated_volume": 1156,
+      "current_position": 12.6,
+      "intent": "Informational",
+      "brief": "Definitive resource page targeting this keyword cluster \u2014 build topical authority by covering the full topic, then link out to supporting how-to posts."
+    },
+    {
+      "priority": "P2",
+      "title": "Tradeline Companies: What to Compare and What to Ask Before You Choose",
+      "keyword": "tradeline companies",
+      "estimated_volume": 564,
+      "current_position": 9.1,
+      "intent": "Commercial Investigation",
+      "brief": "Neutral comparison post with a structured table above the fold \u2014 Google AI Overview pulls from tables, and this keyword has commercial intent buyers ready to act."
+    }
+  ]
+}

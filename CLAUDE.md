@@ -1,4 +1,4 @@
-# SEO Agent — mikefutia.com
+# SEO Agent — ezecreditservices.com
 
 ## What This Project Is
 An SEO intelligence system that connects to Google Search Console, identifies keyword gaps, maps competitors, and generates a weekly content plan and HTML dashboard — all from a single prompt.
