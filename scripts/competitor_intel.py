@@ -24,6 +24,19 @@ def get_latest_gap_analysis():
         return json.load(f)
 
 
+def own_domain():
+    """Bare domain of our own site, derived from GSC_SITE_URL."""
+    site = os.getenv("GSC_SITE_URL", "")
+    site = site.replace("sc-domain:", "").split("://")[-1].split("/")[0].lower()
+    return site[4:] if site.startswith("www.") else site
+
+
+def is_own_domain(domain):
+    own = own_domain()
+    domain = (domain or "").lower()
+    return bool(own) and (domain == own or domain.endswith("." + own))
+
+
 def search_google(query, num_results=3):
     """Search Google and return top organic results using SerpAPI or requests fallback."""
     # Try DataForSEO if credentials available
@@ -31,14 +44,20 @@ def search_google(query, num_results=3):
     password = os.getenv("DATAFORSEO_PASSWORD")
 
     if login and password:
-        return search_dataforseo(query, login, password, num_results)
+        # Over-fetch so dropping our own domain still leaves num_results rivals
+        results = search_dataforseo(query, login, password, num_results + 3)
+        return [r for r in results if not is_own_domain(r.get("domain"))][:num_results]
     else:
         # Fallback: basic search via requests (limited, for demo)
         return search_basic(query, num_results)
 
 
-def search_dataforseo(query, login, password, num_results=3):
-    """Use DataForSEO SERP API to get real competitor data."""
+def search_dataforseo(query, login, password, num_results=3, attempts=4):
+    """Use DataForSEO SERP API to get real competitor data.
+
+    Retries with backoff on timeouts, rate limits, and empty results.
+    Returns [] if every attempt fails — never placeholder data.
+    """
     url = "https://api.dataforseo.com/v3/serp/google/organic/live/advanced"
     payload = [{
         "keyword": query,
@@ -47,29 +66,31 @@ def search_dataforseo(query, login, password, num_results=3):
         "depth": 10,
     }]
 
-    try:
-        response = requests.post(
-            url,
-            auth=(login, password),
-            json=payload,
-            timeout=30,
-        )
-        data = response.json()
-        results = []
-        items = data.get("tasks", [{}])[0].get("result", [{}])[0].get("items", [])
-        for item in items[:num_results]:
-            if item.get("type") == "organic":
-                results.append({
+    for attempt in range(1, attempts + 1):
+        try:
+            response = requests.post(url, auth=(login, password), json=payload, timeout=90)
+            task = (response.json().get("tasks") or [{}])[0]
+            if task.get("status_code") != 20000:
+                raise RuntimeError(f"task {task.get('status_code')}: {task.get('status_message')}")
+            items = ((task.get("result") or [{}])[0] or {}).get("items") or []
+            results = [
+                {
                     "url": item.get("url", ""),
                     "domain": item.get("domain", ""),
                     "title": item.get("title", ""),
                     "description": item.get("description", ""),
                     "rank": item.get("rank_absolute", 0),
-                })
-        return results
-    except Exception as e:
-        print(f"  DataForSEO error: {e}. Falling back to basic search.")
-        return search_basic(query, num_results)
+                }
+                for item in items if item.get("type") == "organic"
+            ][:num_results]
+            if not results:
+                raise RuntimeError("no organic results returned")
+            return results
+        except Exception as e:
+            print(f"  DataForSEO attempt {attempt}/{attempts} failed: {e}")
+            if attempt < attempts:
+                time.sleep(5 * attempt)
+    return []
 
 
 def search_basic(query, num_results=3):
@@ -139,11 +160,17 @@ def run_competitor_intel():
     results = []
     quick_wins = []
     avoid_list = []
+    failed_keywords = []
 
     for keyword in keywords:
         print(f"  Searching: \"{keyword}\"...")
         competitors = search_google(keyword, num_results=3)
-        time.sleep(1)  # Rate limiting
+        time.sleep(3)  # Rate limiting
+
+        if not competitors:
+            print(f"  ⚠️  \"{keyword}\" — no data after retries, skipping")
+            failed_keywords.append(keyword)
+            continue
 
         keyword_results = []
         for comp in competitors:
@@ -176,7 +203,8 @@ def run_competitor_intel():
 
     output_data = {
         "date": today,
-        "keywords_analyzed": len(keywords),
+        "keywords_analyzed": len(keywords) - len(failed_keywords),
+        "failed_keywords": failed_keywords,
         "results": results,
         "quick_wins": quick_wins[:3],
         "avoid_list": avoid_list[:3],
@@ -197,6 +225,9 @@ def run_competitor_intel():
             threat_emoji = "🔴" if r["threat"] == "HIGH" else "🟡" if r["threat"] == "MEDIUM" else "🟢"
             f.write(f"| {r['keyword']} | {r['competitor']} | {threat_emoji} {r['threat']} | {r['reason']} |\n")
 
+        if failed_keywords:
+            f.write(f"\n**No data (lookup failed):** {', '.join(failed_keywords)}\n")
+
         f.write(f"\n## Quick Wins (LOW Threat — Displaceable This Month)\n")
         for qw in quick_wins[:3]:
             f.write(f"- **{qw['keyword']}** → {qw['competitor']}: {qw['reason']}\n")
@@ -208,6 +239,8 @@ def run_competitor_intel():
     print(f"\n✅ Reports saved:")
     print(f"   {md_path}")
     print(f"   {json_path}")
+    if failed_keywords:
+        print(f"\n⚠️  {len(failed_keywords)} keyword(s) had no data: {', '.join(failed_keywords)}")
     print(f"\n🟢 Quick wins: {len(quick_wins)} LOW-threat competitors you can displace this month")
     print(f"🔴 Avoid: {len(avoid_list)} HIGH-threat keywords — find related angles instead")
 
