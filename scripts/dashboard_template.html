@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEO Intelligence Dashboard</title>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --surface-2: #f3f2ee;
+  --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,.10);
+  --accent: #2a78d6; --imp: #86b6ef; --clk: #184f95;
+  --crit: #d03b3b; --warn: #fab219; --good: #0ca30c;
+  --up: #006300; --down: #d03b3b;
+  --on-crit: #fff; --on-warn: #0b0b0b; --on-good: #fff;
+  --shadow: 0 1px 2px rgba(11,11,11,.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --surface-2: #232321;
+    --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,.10);
+    --accent: #3987e5; --imp: #184f95; --clk: #6da7ec;
+    --up: #0ca30c; --down: #ec835a;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --surface-2: #232321;
+  --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,.10);
+  --accent: #3987e5; --imp: #184f95; --clk: #6da7ec;
+  --up: #0ca30c; --down: #ec835a;
+  --shadow: none;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+body {
+  margin: 0; background: var(--page); color: var(--ink);
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+h1, h2, h3, p { margin: 0; }
+button, input, select { font: inherit; color: inherit; }
+a { color: var(--accent); }
+.num { font-variant-numeric: tabular-nums; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ── Header ─────────────────────────────────────────── */
+.topbar {
+  position: sticky; top: 0; z-index: 20; background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-inner {
+  max-width: 1280px; margin: 0 auto; padding: 10px 16px;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.brand { display: flex; flex-direction: column; line-height: 1.2; margin-right: auto; min-width: 0; }
+.brand b { font-size: 15px; }
+.brand span { font-size: 12px; color: var(--ink-2); overflow-wrap: anywhere; }
+.nav { display: flex; gap: 2px; overflow-x: auto; max-width: 100%; }
+.nav a {
+  color: var(--ink-2); text-decoration: none; padding: 6px 10px; border-radius: 6px;
+  font-size: 13px; white-space: nowrap;
+}
+.nav a:hover { background: var(--surface-2); color: var(--ink); }
+.icon-btn {
+  border: 1px solid var(--border); background: var(--surface); border-radius: 6px;
+  padding: 6px 10px; cursor: pointer; font-size: 13px;
+}
+.icon-btn:hover { background: var(--surface-2); }
+
+/* ── Layout ─────────────────────────────────────────── */
+main { max-width: 1280px; margin: 0 auto; padding: 20px 16px 48px; display: grid; gap: 28px; }
+section { display: grid; gap: 14px; }
+.section-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.section-head h2 { font-size: 17px; }
+.section-head .sub { font-size: 12px; color: var(--ink-2); }
+.grid { display: grid; gap: 14px; }
+.kpis { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); }
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px; box-shadow: var(--shadow); min-width: 0;
+}
+.card h3 { font-size: 13px; font-weight: 600; }
+.card .hint { font-size: 12px; color: var(--ink-2); margin-top: 2px; }
+.card-head { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; }
+
+/* ── KPI tiles ──────────────────────────────────────── */
+.kpi .label { font-size: 12px; color: var(--ink-2); }
+.kpi .value { font-size: 30px; font-weight: 650; line-height: 1.15; margin: 4px 0 2px; }
+.kpi .delta { font-size: 12px; color: var(--ink-2); }
+.d-up { color: var(--up); font-weight: 600; }
+.d-down { color: var(--down); font-weight: 600; }
+.d-flat { color: var(--ink-2); font-weight: 600; }
+
+/* ── Hero opportunity ───────────────────────────────── */
+.hero { display: grid; gap: 6px; border-left: 4px solid var(--accent); }
+.hero .eyebrow { font-size: 12px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; }
+.hero .kw { font-size: 22px; font-weight: 650; overflow-wrap: anywhere; }
+.hero .meta { display: flex; gap: 18px; flex-wrap: wrap; color: var(--ink-2); font-size: 13px; }
+.hero .meta b { color: var(--ink); }
+.hero .rec { max-width: 80ch; }
+
+/* ── Chips, badges ──────────────────────────────────── */
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  border: 1px solid var(--border); background: var(--surface); border-radius: 999px;
+  padding: 4px 12px; font-size: 12px; cursor: pointer; color: var(--ink-2);
+}
+.chip:hover { background: var(--surface-2); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.badge {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600;
+  padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--surface-2); color: var(--ink); white-space: nowrap;
+}
+.badge .sw { width: 9px; height: 9px; flex: none; }
+.sw-HIGH { background: var(--crit); border-radius: 2px; }
+.sw-MEDIUM { background: var(--warn); border-radius: 50%; }
+.sw-LOW { background: var(--good); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+
+/* ── Toolbar / inputs ───────────────────────────────── */
+.toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.toolbar input[type=search], .toolbar select {
+  border: 1px solid var(--border); background: var(--surface); border-radius: 6px;
+  padding: 6px 10px; min-width: 0;
+}
+.toolbar input[type=search] { width: min(100%, 240px); }
+.toolbar .count { font-size: 12px; color: var(--ink-2); margin-left: auto; }
+
+/* ── Tables ─────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { font-size: 12px; font-weight: 600; color: var(--ink-2); background: var(--surface-2); white-space: nowrap; position: sticky; top: 0; }
+th.r, td.r { text-align: right; }
+th button { all: unset; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; }
+th button:focus-visible, .chip:focus-visible, .icon-btn:focus-visible, tr.kw-row:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+tbody tr:last-child td { border-bottom: 0; }
+tr.kw-row { cursor: pointer; }
+tr.kw-row:hover td { background: var(--surface-2); }
+tr.detail td { background: var(--surface-2); color: var(--ink-2); }
+td.kw { font-weight: 600; overflow-wrap: anywhere; min-width: 150px; }
+td.why { color: var(--ink-2); min-width: 260px; }
+.empty { padding: 28px 16px; text-align: center; color: var(--ink-2); }
+.group-start td { border-top: 1px solid var(--axis); }
+
+/* ── Charts ─────────────────────────────────────────── */
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.hbar { display: grid; grid-template-columns: minmax(90px, 190px) 1fr; gap: 6px 12px; align-items: center; }
+.hbar .name { font-size: 13px; overflow-wrap: anywhere; }
+.hbar .name small { color: var(--ink-2); display: block; font-size: 11px; }
+.track { display: flex; gap: 2px; height: 22px; align-items: center; min-width: 0; }
+.seg { height: 100%; min-width: 2px; }
+.seg.imp { background: var(--imp); border-radius: 0 4px 4px 0; }
+.seg.clk { background: var(--clk); border-radius: 0 4px 4px 0; }
+.seg.clk + .seg.imp { border-radius: 0 4px 4px 0; }
+.track .val { margin-left: 8px; font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.track:hover .seg, .track:focus-visible .seg { filter: brightness(.92); }
+.track:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.stack .seg { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; border-radius: 0; }
+.stack .seg:first-child { border-radius: 4px 0 0 4px; }
+.stack .seg:last-child { border-radius: 0 4px 4px 0; }
+.seg.HIGH { background: var(--crit); color: var(--on-crit); }
+.seg.MEDIUM { background: var(--warn); color: var(--on-warn); }
+.seg.LOW { background: var(--good); color: var(--on-good); }
+svg text { font-family: inherit; }
+.chart-svg { width: 100%; display: block; overflow: visible; }
+.ax { fill: var(--muted); font-size: 11px; }
+.ax-strong { fill: var(--ink-2); font-size: 11px; }
+.gridline { stroke: var(--grid); stroke-width: 1; }
+.axisline { stroke: var(--axis); stroke-width: 1; }
+.dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; cursor: pointer; }
+.dot:hover, .dot:focus { r: 8; outline: none; }
+.dot-label { fill: var(--ink); font-size: 11px; pointer-events: none; }
+.line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.pt { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.ref { stroke: var(--ink-2); stroke-dasharray: 4 4; stroke-width: 1; }
+.trend-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.trend h4 { margin: 0 0 4px; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+
+#tip {
+  position: fixed; z-index: 50; pointer-events: none; opacity: 0; transition: opacity .08s;
+  background: var(--ink); color: var(--surface); border-radius: 6px; padding: 7px 10px;
+  font-size: 12px; max-width: 260px; box-shadow: 0 4px 14px rgba(0,0,0,.25);
+}
+#tip b { display: block; margin-bottom: 2px; }
+
+/* ── Content plan ───────────────────────────────────── */
+.plan { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.plan .card { display: grid; gap: 10px; align-content: start; }
+.plan .card.done { opacity: .6; }
+.plan .title { font-size: 15px; font-weight: 650; }
+.plan .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.plan dl { display: grid; grid-template-columns: repeat(3, auto); gap: 4px 16px; margin: 0; justify-content: start; }
+.plan dt { font-size: 11px; color: var(--ink-2); }
+.plan dd { margin: 0; font-weight: 650; font-size: 15px; }
+.plan .brief { color: var(--ink-2); }
+.plan .rivals { font-size: 12px; color: var(--ink-2); }
+.plan .foot { display: flex; justify-content: space-between; gap: 8px; align-items: center; flex-wrap: wrap; border-top: 1px solid var(--grid); padding-top: 10px; }
+.plan label { font-size: 13px; display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.pri { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+
+/* ── Callouts ───────────────────────────────────────── */
+.note {
+  border: 1px solid var(--border); border-left: 4px solid var(--warn); background: var(--surface);
+  border-radius: 8px; padding: 10px 14px; font-size: 13px; color: var(--ink-2);
+}
+.list { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.list li { display: grid; gap: 2px; font-size: 13px; }
+.list li b { overflow-wrap: anywhere; }
+.list li span { color: var(--ink-2); }
+footer { max-width: 1280px; margin: 0 auto; padding: 0 16px 32px; font-size: 12px; color: var(--ink-2); }
+
+@media (max-width: 640px) {
+  .hbar { grid-template-columns: 1fr; gap: 2px; }
+  .hbar .name { margin-top: 8px; }
+  .kpi .value { font-size: 26px; }
+}
+@media print, (forced-colors: active) {
+  .seg.imp { background-image: repeating-linear-gradient(135deg, currentColor 0 1px, transparent 1px 5px); border: 1px solid CanvasText; }
+  .seg.clk { background: CanvasText; }
+}
+@media print { .topbar, .toolbar, .icon-btn { display: none; } }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><b>SEO Intelligence</b><span id="brandSite"></span></div>
+    <nav class="nav" aria-label="Sections">
+      <a href="#overview">Overview</a>
+      <a href="#charts">Charts</a>
+      <a href="#keywords">Keywords</a>
+      <a href="#competitors">Competitors</a>
+      <a href="#plan">Content plan</a>
+    </nav>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle light or dark theme">Theme</button>
+  </div>
+</header>
+
+<main>
+  <section id="overview" aria-labelledby="h-overview">
+    <div class="section-head"><h2 id="h-overview">Overview</h2><span class="sub" id="overviewSub"></span></div>
+    <div class="grid kpis" id="kpis"></div>
+    <div class="card hero" id="hero"></div>
+  </section>
+
+  <section id="charts" aria-labelledby="h-charts">
+    <div class="section-head"><h2 id="h-charts">Charts</h2><span class="sub">Hover or focus a mark for details. The keyword table below has every value.</span></div>
+    <div class="grid two">
+      <div class="card">
+        <div class="card-head">
+          <div><h3>Impressions by gap keyword</h3><p class="hint">Top 10 by impressions, positions 5–20</p></div>
+          <div class="legend"><span><i style="background:var(--clk)"></i>Clicks</span><span><i style="background:var(--imp)"></i>Impressions without a click</span></div>
+        </div>
+        <div class="hbar" id="barChart"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h3>Position vs. impressions</h3><p class="hint">Further left = closer to the top of page 1</p></div></div>
+        <svg class="chart-svg" id="scatter" role="img" aria-label="Scatter chart of average position against impressions for the top gap keywords"></svg>
+      </div>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <div class="card-head">
+          <div><h3>Competitor threat by keyword</h3><p class="hint">Top-ranking rivals per keyword (excluding your own site)</p></div>
+          <div class="legend" id="threatLegend"></div>
+        </div>
+        <div class="hbar stack" id="threatChart"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h3>Trend across runs</h3><p class="hint" id="trendHint"></p></div></div>
+        <div class="trend-grid" id="trend"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="keywords" aria-labelledby="h-keywords">
+    <div class="section-head"><h2 id="h-keywords">Keyword opportunities</h2><span class="sub">Click a row for the recommendation. Click a column to sort.</span></div>
+    <div class="toolbar">
+      <input type="search" id="kwSearch" placeholder="Filter keywords" aria-label="Filter keywords">
+      <select id="kwRec" aria-label="Filter by action"></select>
+      <span class="count" id="kwCount"></span>
+    </div>
+    <div class="table-wrap"><table id="kwTable"></table></div>
+  </section>
+
+  <section id="competitors" aria-labelledby="h-comp">
+    <div class="section-head"><h2 id="h-comp">Competitor intelligence</h2><span class="sub" id="compSub"></span></div>
+    <div id="compNotes"></div>
+    <div class="grid two">
+      <div class="card"><div class="card-head"><div><h3>Quick wins</h3><p class="hint">LOW threat — one focused article can displace them</p></div></div><ul class="list" id="quickWins"></ul></div>
+      <div class="card"><div class="card-head"><div><h3>Avoid head-on</h3><p class="hint">HIGH threat — find a related angle</p></div></div><ul class="list" id="avoid"></ul></div>
+    </div>
+    <div class="toolbar">
+      <div class="chips" id="threatChips" role="group" aria-label="Filter by threat level"></div>
+      <select id="compKw" aria-label="Filter by keyword"></select>
+      <span class="count" id="compCount"></span>
+    </div>
+    <div class="table-wrap"><table id="compTable"></table></div>
+  </section>
+
+  <section id="plan" aria-labelledby="h-plan">
+    <div class="section-head"><h2 id="h-plan">This week's content plan</h2><span class="sub" id="planSub"></span></div>
+    <div class="grid plan" id="planGrid"></div>
+  </section>
+</main>
+
+<footer id="foot"></footer>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const DATA = /*__DASHBOARD_DATA__*/null;
+
+(() => {
+"use strict";
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = (n) => Number(n).toLocaleString("en-US");
+const fmt1 = (n) => Number(n).toLocaleString("en-US", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+const SVGNS = "http://www.w3.org/2000/svg";
+const svgEl = (tag, attrs = {}, text) => {
+  const e = document.createElementNS(SVGNS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text != null) e.textContent = text;
+  return e;
+};
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch { /* storage unavailable */ } },
+};
+const prettyDate = (d) => d ? new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "";
+const shortDate = (d) => d ? new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "";
+const REC_LABELS = {
+  NO_PAGE: "New article", NO_INTERNAL_LINKS: "Add internal links", WEAK_TITLE: "Update title",
+  STRUCTURAL_ISSUE: "Restructure", NEEDS_HUB: "Add hub page", NEEDS_DEPTH: "Improve depth",
+};
+const recLabel = (t) => REC_LABELS[t] || String(t || "Review").toLowerCase().replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
+const THREAT_ORDER = ["HIGH", "MEDIUM", "LOW"];
+const THREAT_LABEL = { HIGH: "High", MEDIUM: "Medium", LOW: "Low" };
+const threatBadge = (t) => `<span class="badge"><span class="sw sw-${esc(t)}"></span>${esc(THREAT_LABEL[t] || t)}</span>`;
+
+// ── Theme ─────────────────────────────────────────────
+const root = document.documentElement;
+const saved = store.get("seo-dash-theme");
+if (saved === "light" || saved === "dark") root.setAttribute("data-theme", saved);
+$("themeBtn").addEventListener("click", () => {
+  const dark = root.getAttribute("data-theme") === "dark" ||
+    (!root.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+  const next = dark ? "light" : "dark";
+  root.setAttribute("data-theme", next);
+  store.set("seo-dash-theme", next);
+});
+
+// ── Tooltip ───────────────────────────────────────────
+const tip = $("tip");
+function showTip(html, x, y) {
+  tip.innerHTML = html;
+  tip.style.opacity = "1";
+  const r = tip.getBoundingClientRect();
+  const left = Math.min(Math.max(8, x + 14), innerWidth - r.width - 8);
+  const top = y + 18 + r.height > innerHeight ? y - r.height - 12 : y + 18;
+  tip.style.left = left + "px";
+  tip.style.top = Math.max(8, top) + "px";
+}
+const hideTip = () => { tip.style.opacity = "0"; };
+function bindTip(el, html) {
+  el.addEventListener("mousemove", (e) => showTip(html, e.clientX, e.clientY));
+  el.addEventListener("mouseleave", hideTip);
+  el.addEventListener("focus", () => { const r = el.getBoundingClientRect(); showTip(html, r.left + r.width / 2, r.top); });
+  el.addEventListener("blur", hideTip);
+}
+const tipHtml = (title, lines) => `<b>${esc(title)}</b>` + lines.map((l) => `<div>${l}</div>`).join("");
+
+// ── KPIs + hero ───────────────────────────────────────
+const kws = DATA.keywords || [];
+const k = DATA.kpis || {};
+const pk = DATA.prevKpis;
+$("brandSite").textContent = DATA.site;
+$("overviewSub").textContent = `Search Console, last 90 days · report ${prettyDate(DATA.gapDate)}` +
+  (DATA.prevDate ? ` · compared with ${prettyDate(DATA.prevDate)}` : "");
+
+function deltaHtml(cur, prev, { lowerIsBetter = false, neutral = false, decimals = 0 } = {}) {
+  if (prev == null) return `<span class="d-flat">First run</span>`;
+  const diff = cur - prev;
+  const abs = Math.abs(diff);
+  if (abs < (decimals ? 0.05 : 0.5)) return `<span class="d-flat">● No change</span> vs ${esc(shortDate(DATA.prevDate))}`;
+  const up = diff > 0;
+  const good = lowerIsBetter ? !up : up;
+  const cls = neutral ? "d-flat" : good ? "d-up" : "d-down";
+  const txt = decimals ? abs.toFixed(decimals) : fmt(abs);
+  const pct = prev ? ` (${(abs / Math.abs(prev) * 100).toFixed(1)}%)` : "";
+  return `<span class="${cls}">${up ? "▲" : "▼"} ${txt}${pct}</span> vs ${esc(shortDate(DATA.prevDate))}`;
+}
+const ctrAll = k.total_impressions ? k.total_clicks / k.total_impressions * 100 : 0;
+const prevCtr = pk && pk.total_impressions ? pk.total_clicks / pk.total_impressions * 100 : null;
+const tiles = [
+  { label: "Total impressions", value: fmt(k.total_impressions ?? 0), delta: deltaHtml(k.total_impressions, pk?.total_impressions) },
+  { label: "Total clicks", value: fmt(k.total_clicks ?? 0), delta: deltaHtml(k.total_clicks, pk?.total_clicks) },
+  { label: "Overall CTR", value: ctrAll.toFixed(2) + "%", delta: deltaHtml(ctrAll, prevCtr, { decimals: 2 }) },
+  { label: "Gap-zone keywords (pos 5–20)", value: fmt(k.gap_zone_count ?? 0), delta: deltaHtml(k.gap_zone_count, pk?.gap_zone_count, { neutral: true }) },
+  { label: "Average position", value: fmt1(k.avg_position ?? 0), delta: deltaHtml(k.avg_position, pk?.avg_position, { lowerIsBetter: true, decimals: 1 }) },
+];
+$("kpis").innerHTML = tiles.map((t) =>
+  `<div class="card kpi"><div class="label">${esc(t.label)}</div><div class="value num">${esc(t.value)}</div><div class="delta">${t.delta}</div></div>`).join("");
+
+const top = kws[0];
+$("hero").innerHTML = top ? `
+  <div class="eyebrow">Top opportunity</div>
+  <div class="kw">“${esc(top.keyword)}”</div>
+  <div class="meta">
+    <span><b class="num">${fmt(top.impressions)}</b> impressions</span>
+    <span>position <b class="num">${fmt1(top.position)}</b></span>
+    <span><b class="num">${fmt(top.clicks)}</b> clicks (${fmt1(top.ctr)}% CTR)</span>
+    <span>${esc(recLabel(top.rec_type))}</span>
+  </div>
+  <p class="rec">${esc(top.recommendation)}</p>` : `<p>No gap-zone keywords found.</p>`;
+
+// ── Bar chart: impressions split into clicks / no click ─
+(function bars() {
+  const rows = [...kws].sort((a, b) => b.impressions - a.impressions).slice(0, 10);
+  const max = Math.max(1, ...rows.map((r) => r.impressions));
+  const el = $("barChart");
+  if (!rows.length) { el.innerHTML = `<div class="empty">No data.</div>`; return; }
+  el.innerHTML = "";
+  rows.forEach((r) => {
+    const name = document.createElement("div");
+    name.className = "name";
+    name.innerHTML = `${esc(r.keyword)}<small>position ${fmt1(r.position)}</small>`;
+    const track = document.createElement("div");
+    track.className = "track";
+    track.tabIndex = 0;
+    const total = r.impressions / max * 100;
+    const clkW = r.clicks / r.impressions * total;
+    track.innerHTML =
+      `<div class="seg clk" style="width:${clkW}%"></div>` +
+      `<div class="seg imp" style="width:calc(${total - clkW}% - 2px)"></div>` +
+      `<span class="val num">${fmt(r.impressions)}</span>`;
+    track.setAttribute("aria-label", `${r.keyword}: ${r.impressions} impressions, ${r.clicks} clicks, position ${r.position}`);
+    bindTip(track, tipHtml(r.keyword, [
+      `Impressions: <b style="display:inline">${fmt(r.impressions)}</b>`,
+      `Clicks: ${fmt(r.clicks)} (${fmt1(r.ctr)}% CTR)`,
+      `Position: ${fmt1(r.position)}`,
+    ]));
+    el.append(name, track);
+  });
+})();
+
+// ── Scatter: position vs impressions ──────────────────
+function scatter() {
+  const svg = $("scatter");
+  svg.innerHTML = "";
+  const data = kws.slice(0, 10);
+  if (!data.length) return;
+  const W = svg.clientWidth || 460, H = 300;
+  const m = { l: 48, r: 14, t: 14, b: 40 };
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("height", H);
+  const xs = data.map((d) => d.position);
+  const xmin = Math.floor(Math.min(...xs, 9) - 1), xmax = Math.ceil(Math.max(...xs, 11) + 1);
+  const ymax = niceMax(Math.max(...data.map((d) => d.impressions)));
+  const X = (v) => m.l + (v - xmin) / (xmax - xmin) * (W - m.l - m.r);
+  const Y = (v) => H - m.b - v / ymax * (H - m.t - m.b);
+  for (let i = 0; i <= 4; i++) {
+    const v = ymax / 4 * i;
+    svg.append(svgEl("line", { class: i ? "gridline" : "axisline", x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v) }));
+    svg.append(svgEl("text", { class: "ax", x: m.l - 8, y: Y(v) + 4, "text-anchor": "end" }, fmt(Math.round(v))));
+  }
+  for (let v = xmin; v <= xmax; v++) {
+    if ((xmax - xmin) > 8 && v % 2) continue;
+    svg.append(svgEl("text", { class: "ax", x: X(v), y: H - m.b + 16, "text-anchor": "middle" }, v));
+  }
+  svg.append(svgEl("text", { class: "ax-strong", x: (m.l + W - m.r) / 2, y: H - 6, "text-anchor": "middle" }, "Average position"));
+  svg.append(svgEl("line", { class: "ref", x1: X(10), x2: X(10), y1: m.t, y2: H - m.b }));
+  svg.append(svgEl("text", { class: "ax-strong", x: X(10) + 5, y: m.t + 10 }, "Page 1 boundary"));
+  const top4 = new Set([...data].sort((a, b) => b.impressions - a.impressions).slice(0, 4).map((d) => d.keyword));
+  data.forEach((d) => {
+    const c = svgEl("circle", { class: "dot", cx: X(d.position), cy: Y(d.impressions), r: 6, tabindex: 0,
+      "aria-label": `${d.keyword}: position ${d.position}, ${d.impressions} impressions` });
+    bindTip(c, tipHtml(d.keyword, [`Position: ${fmt1(d.position)}`, `Impressions: ${fmt(d.impressions)}`, `CTR: ${fmt1(d.ctr)}%`]));
+    svg.append(c);
+    if (top4.has(d.keyword)) {
+      const right = X(d.position) > W * 0.55;
+      svg.append(svgEl("text", { class: "dot-label", x: X(d.position) + (right ? -10 : 10), y: Y(d.impressions) + 4,
+        "text-anchor": right ? "end" : "start" }, d.keyword));
+    }
+  });
+}
+function niceMax(v) {
+  const p = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const s of [1, 2, 2.5, 5, 10]) if (s * p >= v) return s * p;
+  return v;
+}
+
+// ── Competitor threat chart + legend ──────────────────
+const comps = DATA.competitors || [];
+(function threat() {
+  $("threatLegend").innerHTML = THREAT_ORDER.map((t) => `<span>${threatBadge(t)}</span>`).join("");
+  const el = $("threatChart");
+  const byKw = new Map();
+  comps.forEach((c) => {
+    if (!byKw.has(c.keyword)) byKw.set(c.keyword, { HIGH: 0, MEDIUM: 0, LOW: 0 });
+    byKw.get(c.keyword)[c.threat]++;
+  });
+  if (!byKw.size) { el.innerHTML = `<div class="empty" style="grid-column:1/-1">No competitor data for this run.</div>`; return; }
+  const max = Math.max(...[...byKw.values()].map((v) => v.HIGH + v.MEDIUM + v.LOW));
+  byKw.forEach((v, kw) => {
+    const name = document.createElement("div");
+    name.className = "name";
+    name.textContent = kw;
+    const track = document.createElement("div");
+    track.className = "track";
+    track.tabIndex = 0;
+    const n = v.HIGH + v.MEDIUM + v.LOW;
+    track.innerHTML = THREAT_ORDER.filter((t) => v[t]).map((t) =>
+      `<div class="seg ${t}" style="width:calc(${v[t] / max * 100}% - 2px)" title="">${v[t]}</div>`).join("");
+    track.setAttribute("aria-label", `${kw}: ${THREAT_ORDER.map((t) => `${v[t]} ${t.toLowerCase()}`).join(", ")}`);
+    bindTip(track, tipHtml(kw, THREAT_ORDER.map((t) => `${THREAT_LABEL[t]}: ${v[t]} of ${n}`)));
+    el.append(name, track);
+  });
+})();
+
+// ── Trend lines (one measure per chart, no dual axis) ─
+function trend() {
+  const el = $("trend");
+  el.innerHTML = "";
+  const h = DATA.history || [];
+  $("trendHint").textContent = h.length < 2
+    ? "Needs at least two runs — it fills in as you run the weekly workflow."
+    : `${h.length} runs, ${shortDate(h[0].date)} – ${shortDate(h[h.length - 1].date)}`;
+  if (h.length < 2) return;
+  const measures = [
+    ["Impressions", "total_impressions", fmt], ["Clicks", "total_clicks", fmt],
+    ["Gap-zone keywords", "gap_zone_count", fmt], ["Average position", "avg_position", fmt1],
+  ];
+  // Create every cell first so the grid has laid out before any chart measures its width.
+  const cells = measures.map(([label, key, f]) => {
+    const wrap = document.createElement("div");
+    wrap.className = "trend";
+    wrap.innerHTML = `<h4>${esc(label)}</h4>`;
+    const svg = svgEl("svg", { class: "chart-svg", role: "img", "aria-label": `${label} across runs` });
+    wrap.append(svg);
+    el.append(wrap);
+    return { label, key, f, wrap, svg };
+  });
+  cells.forEach(({ label, key, f, wrap, svg }) => {
+    const W = wrap.clientWidth || 220, H = 110, m = { l: 6, r: 10, t: 10, b: 20 };
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("height", H);
+    const vals = h.map((r) => r[key]);
+    let lo = Math.min(...vals), hi = Math.max(...vals);
+    if (lo === hi) { lo -= 1; hi += 1; }
+    const pad = (hi - lo) * 0.2; lo -= pad; hi += pad;
+    const X = (i) => m.l + i / (h.length - 1) * (W - m.l - m.r);
+    const Y = (v) => H - m.b - (v - lo) / (hi - lo) * (H - m.t - m.b);
+    svg.append(svgEl("line", { class: "axisline", x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b }));
+    svg.append(svgEl("path", { class: "line", d: vals.map((v, i) => `${i ? "L" : "M"}${X(i)},${Y(v)}`).join("") }));
+    svg.append(svgEl("text", { class: "ax", x: m.l, y: H - 4 }, shortDate(h[0].date)));
+    svg.append(svgEl("text", { class: "ax", x: W - m.r, y: H - 4, "text-anchor": "end" }, shortDate(h[h.length - 1].date)));
+    h.forEach((r, i) => {
+      const c = svgEl("circle", { class: "pt", cx: X(i), cy: Y(r[key]), r: 5, tabindex: 0, "aria-label": `${label} ${f(r[key])} on ${r.date}` });
+      bindTip(c, tipHtml(prettyDate(r.date), [`${esc(label)}: ${f(r[key])}`]));
+      svg.append(c);
+    });
+    const last = vals[vals.length - 1];
+    svg.append(svgEl("text", { class: "dot-label", x: X(h.length - 1), y: Y(last) - 10, "text-anchor": "end", style: "font-weight:600" }, f(last)));
+  });
+}
+
+// ── Keyword table ─────────────────────────────────────
+const kwState = { sort: "impressions", dir: -1, q: "", rec: "" };
+const kwCols = [
+  ["keyword", "Keyword", false], ["impressions", "Impressions", true], ["clicks", "Clicks", true],
+  ["ctr", "CTR", true], ["position", "Position", true], ["move", "vs. last run", true], ["rec_type", "Action", false],
+];
+const moveOf = (r) => r.prev_position == null ? null : r.prev_position - r.position; // positive = climbed
+$("kwRec").innerHTML = `<option value="">All actions</option>` +
+  [...new Set(kws.map((r) => r.rec_type))].map((t) => `<option value="${esc(t)}">${esc(recLabel(t))}</option>`).join("");
+function renderKw() {
+  let rows = kws.filter((r) =>
+    (!kwState.rec || r.rec_type === kwState.rec) && (!kwState.q || r.keyword.toLowerCase().includes(kwState.q)));
+  const key = kwState.sort;
+  const val = (r) => key === "move" ? moveOf(r) : r[key];
+  rows.sort((a, b) => {
+    const x = val(a), y = val(b);
+    if (x == null) return 1; if (y == null) return -1;
+    return (typeof x === "string" ? x.localeCompare(y) : x - y) * kwState.dir;
+  });
+  $("kwCount").textContent = `${rows.length} of ${kws.length} shown (top 10 by impressions)`;
+  const head = kwCols.map(([key2, label, right]) => {
+    const active = kwState.sort === key2;
+    const arrow = active ? (kwState.dir > 0 ? "▲" : "▼") : "";
+    return `<th class="${right ? "r" : ""}" aria-sort="${active ? (kwState.dir > 0 ? "ascending" : "descending") : "none"}">` +
+      `<button type="button" data-sort="${key2}">${esc(label)} <span aria-hidden="true">${arrow}</span></button></th>`;
+  }).join("");
+  const body = rows.length ? rows.map((r, i) => {
+    const mv = moveOf(r);
+    const mvHtml = mv == null ? `<span class="d-flat">New</span>`
+      : Math.abs(mv) < 0.05 ? `<span class="d-flat">● 0.0</span>`
+      : `<span class="${mv > 0 ? "d-up" : "d-down"}">${mv > 0 ? "▲" : "▼"} ${Math.abs(mv).toFixed(1)}</span>`;
+    return `<tr class="kw-row" tabindex="0" data-i="${i}" aria-expanded="false">
+      <td class="kw">${esc(r.keyword)}</td><td class="r num">${fmt(r.impressions)}</td><td class="r num">${fmt(r.clicks)}</td>
+      <td class="r num">${fmt1(r.ctr)}%</td><td class="r num">${fmt1(r.position)}</td><td class="r num">${mvHtml}</td>
+      <td><span class="badge">${esc(recLabel(r.rec_type))}</span></td></tr>
+      <tr class="detail" hidden><td colspan="7">${esc(r.recommendation)}</td></tr>`;
+  }).join("") : `<tr><td colspan="7" class="empty">No keywords match.</td></tr>`;
+  $("kwTable").innerHTML = `<thead><tr>${head}</tr></thead><tbody>${body}</tbody>`;
+}
+$("kwTable").addEventListener("click", (e) => {
+  const sortBtn = e.target.closest("[data-sort]");
+  if (sortBtn) {
+    const key = sortBtn.dataset.sort;
+    kwState.dir = kwState.sort === key ? -kwState.dir : (key === "keyword" || key === "position" ? 1 : -1);
+    kwState.sort = key;
+    renderKw();
+    $("kwTable").querySelector(`[data-sort="${key}"]`).focus();
+    return;
+  }
+  const row = e.target.closest("tr.kw-row");
+  if (row) toggleRow(row);
+});
+$("kwTable").addEventListener("keydown", (e) => {
+  const row = e.target.closest("tr.kw-row");
+  if (row && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); toggleRow(row); }
+});
+function toggleRow(row) {
+  const d = row.nextElementSibling;
+  d.hidden = !d.hidden;
+  row.setAttribute("aria-expanded", String(!d.hidden));
+}
+$("kwSearch").addEventListener("input", (e) => { kwState.q = e.target.value.trim().toLowerCase(); renderKw(); });
+$("kwRec").addEventListener("change", (e) => { kwState.rec = e.target.value; renderKw(); });
+
+// ── Competitors ───────────────────────────────────────
+const compState = { threat: "", kw: "" };
+function renderCompNotes() {
+  const notes = [];
+  if (DATA.compPlaceholder) notes.push("Competitor data is placeholder output (no SERP API configured or every lookup failed), so it is hidden. Fix the DataForSEO credentials and re-run competitor intel.");
+  if ((DATA.failedKeywords || []).length) notes.push(`No competitor data for: ${DATA.failedKeywords.join(", ")}. The lookup failed after retries.`);
+  if (!DATA.compPlaceholder && DATA.compDate && DATA.compDate !== DATA.gapDate) notes.push(`Competitor data is from ${prettyDate(DATA.compDate)}, not the latest gap analysis.`);
+  $("compNotes").innerHTML = notes.map((n) => `<div class="note" style="margin-bottom:8px">${esc(n)}</div>`).join("");
+}
+function listItems(items, empty) {
+  return items.length ? items.map((i) =>
+    `<li><b>${esc(i.keyword)} → ${esc(i.competitor)}</b><span>${esc(i.reason)}</span></li>`).join("")
+    : `<li><span>${esc(empty)}</span></li>`;
+}
+// quick_wins/avoid_list are capped at 3 by the script, so derive the full lists from the rows.
+const allWins = comps.filter((c) => c.threat === "LOW");
+const allAvoid = [];
+comps.filter((c) => c.threat === "HIGH").forEach((c) => {
+  if (!allAvoid.some((a) => a.keyword === c.keyword && a.competitor === c.competitor)) allAvoid.push(c);
+});
+$("compSub").textContent = comps.length
+  ? `${new Set(comps.map((c) => c.keyword)).size} keywords · ${comps.length} rivals · ${allWins.length} low, ${allAvoid.length} high-threat` +
+    (DATA.compDate ? ` · ${prettyDate(DATA.compDate)}` : "")
+  : "";
+$("quickWins").innerHTML = listItems(allWins.slice(0, 6), "No low-threat rivals this run.");
+$("avoid").innerHTML = listItems(allAvoid.slice(0, 6), "No high-threat rivals this run.");
+$("threatChips").innerHTML = [["", "All"], ...THREAT_ORDER.map((t) => [t, THREAT_LABEL[t]])].map(([v, l]) =>
+  `<button type="button" class="chip" data-t="${v}" aria-pressed="${v === compState.threat}">${l}</button>`).join("");
+$("compKw").innerHTML = `<option value="">All keywords</option>` +
+  [...new Set(comps.map((c) => c.keyword))].map((x) => `<option>${esc(x)}</option>`).join("");
+function renderComp() {
+  const rows = comps.filter((c) => (!compState.threat || c.threat === compState.threat) && (!compState.kw || c.keyword === compState.kw));
+  $("compCount").textContent = `${rows.length} of ${comps.length} rivals`;
+  let last = null;
+  const body = rows.length ? rows.map((c) => {
+    const first = c.keyword !== last; last = c.keyword;
+    const link = c.url ? `<a href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">${esc(c.competitor)}</a>` : esc(c.competitor);
+    return `<tr class="${first ? "group-start" : ""}"><td class="kw">${first ? esc(c.keyword) : ""}</td><td>${link}</td><td>${threatBadge(c.threat)}</td><td class="why">${esc(c.reason)}</td></tr>`;
+  }).join("") : `<tr><td colspan="4" class="empty">${comps.length ? "No rivals match these filters." : "No competitor data for this run."}</td></tr>`;
+  $("compTable").innerHTML = `<thead><tr><th>Keyword</th><th>Competitor</th><th>Threat</th><th>Why they win</th></tr></thead><tbody>${body}</tbody>`;
+}
+$("threatChips").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-t]"); if (!b) return;
+  compState.threat = b.dataset.t;
+  $("threatChips").querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", String(c === b)));
+  renderComp();
+});
+$("compKw").addEventListener("change", (e) => { compState.kw = e.target.value; renderComp(); });
+
+// ── Content plan ──────────────────────────────────────
+function renderPlan() {
+  const plan = DATA.plan || [];
+  $("planSub").textContent = plan.length ? `${plan.length} articles${DATA.planDate ? " · " + prettyDate(DATA.planDate) : ""}` : "";
+  const grid = $("planGrid");
+  if (!plan.length) { grid.innerHTML = `<div class="card empty">No content plan yet. Run content_plan.py.</div>`; return; }
+  const rivalsFor = (kw) => {
+    const rows = comps.filter((c) => c.keyword === kw);
+    if (!rows.length) return "No competitor data for this keyword yet.";
+    return "Rivals: " + THREAT_ORDER.map((t) => [t, rows.filter((r) => r.threat === t).length]).filter(([, n]) => n)
+      .map(([t, n]) => `${n} ${THREAT_LABEL[t].toLowerCase()}`).join(", ");
+  };
+  grid.innerHTML = plan.map((a, i) => {
+    const id = `seo-plan-${DATA.planDate}-${a.keyword}`;
+    return `<article class="card ${store.get(id) === "1" ? "done" : ""}" data-id="${esc(id)}">
+      <div class="row"><span class="badge pri">${esc(a.priority)}</span><span class="badge">${esc(a.intent)}</span></div>
+      <div class="title">${esc(a.title)}</div>
+      <dl>
+        <div><dt>Target keyword</dt><dd style="font-size:13px">${esc(a.keyword)}</dd></div>
+        <div><dt>Impressions (90d)</dt><dd class="num">${fmt(a.estimated_volume)}</dd></div>
+        <div><dt>Position</dt><dd class="num">${fmt1(a.current_position)}</dd></div>
+      </dl>
+      <p class="brief">${esc(a.brief)}</p>
+      <p class="rivals">${esc(rivalsFor(a.keyword))}</p>
+      <div class="foot">
+        <label><input type="checkbox" data-done="${i}" ${store.get(id) === "1" ? "checked" : ""}> Drafted</label>
+        <button type="button" class="icon-btn" data-copy="${i}">Copy brief</button>
+      </div></article>`;
+  }).join("");
+}
+$("planGrid").addEventListener("change", (e) => {
+  const cb = e.target.closest("[data-done]"); if (!cb) return;
+  const card = cb.closest("article");
+  card.classList.toggle("done", cb.checked);
+  store.set(card.dataset.id, cb.checked ? "1" : "0");
+});
+$("planGrid").addEventListener("click", async (e) => {
+  const btn = e.target.closest("[data-copy]"); if (!btn) return;
+  const a = DATA.plan[btn.dataset.copy];
+  const text = `${a.title}\nTarget keyword: ${a.keyword} (position ${a.current_position}, ${a.estimated_volume} impressions/90d)\nIntent: ${a.intent}\nBrief: ${a.brief}`;
+  const old = btn.textContent;
+  try { await navigator.clipboard.writeText(text); btn.textContent = "Copied"; }
+  catch { btn.textContent = "Copy failed"; }
+  setTimeout(() => { btn.textContent = old; }, 1500);
+});
+
+// ── Footer + boot ─────────────────────────────────────
+$("foot").textContent = `Generated ${DATA.generated} from reports/gap-analysis-${DATA.gapDate}, ` +
+  `competitive-${DATA.compDate || "n/a"}, content-plan-${DATA.planDate || "n/a"}. Data: Google Search Console` +
+  `${comps.length ? " and DataForSEO" : ""}.`;
+renderKw(); renderCompNotes(); renderComp(); renderPlan(); scatter(); trend();
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { scatter(); trend(); }, 120); });
+})();
+</script>
+</body>
+</html>
