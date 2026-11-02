@@ -8,7 +8,9 @@ import os
 import json
 import datetime
 import time
+import re
 import requests
+from bs4 import BeautifulSoup
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -37,6 +39,18 @@ def is_own_domain(domain):
     return bool(own) and (domain == own or domain.endswith("." + own))
 
 
+# Not rankable competitors: Google's own redirect/feature links and UGC/video hosts
+NON_COMPETITOR_DOMAINS = {
+    "google.com", "youtube.com", "reddit.com", "quora.com", "facebook.com",
+    "linkedin.com", "pinterest.com", "x.com", "twitter.com", "wikipedia.org",
+}
+
+
+def is_non_competitor(domain):
+    domain = (domain or "").lower()
+    return any(domain == d or domain.endswith("." + d) for d in NON_COMPETITOR_DOMAINS)
+
+
 def search_google(query, num_results=3):
     """Search Google and return top organic results using SerpAPI or requests fallback."""
     # Try DataForSEO if credentials available
@@ -44,9 +58,16 @@ def search_google(query, num_results=3):
     password = os.getenv("DATAFORSEO_PASSWORD")
 
     if login and password:
-        # Over-fetch so dropping our own domain still leaves num_results rivals
-        results = search_dataforseo(query, login, password, num_results + 3)
-        return [r for r in results if not is_own_domain(r.get("domain"))][:num_results]
+        # Over-fetch so dropping our own domain and Google/YouTube rows still leaves num_results rivals
+        results = search_dataforseo(query, login, password, num_results + 10)
+        seen, rivals = set(), []
+        for r in results:
+            domain = r.get("domain")
+            if is_own_domain(domain) or is_non_competitor(domain) or domain in seen:
+                continue
+            seen.add(domain)
+            rivals.append(r)
+        return rivals[:num_results]
     else:
         # Fallback: basic search via requests (limited, for demo)
         return search_basic(query, num_results)
@@ -103,47 +124,210 @@ def search_basic(query, num_results=3):
     ]
 
 
+HIGH_AUTHORITY_DOMAINS = [
+    "nerdwallet.com", "experian.com", "equifax.com", "transunion.com", "forbes.com",
+    "bankrate.com", "investopedia.com", "creditkarma.com", "nav.com", "citi.com",
+    "chase.com", "ftc.gov", "consumerfinance.gov", "myfico.com", "lendingtree.com",
+]
+
+USER_AGENT = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+)
+
+
+def fetch_page(url, attempts=2):
+    """Fetch a competitor page. Returns HTML text, or None if it can't be read."""
+    for attempt in range(1, attempts + 1):
+        try:
+            resp = requests.get(
+                url, timeout=20, allow_redirects=True,
+                headers={"User-Agent": USER_AGENT, "Accept-Language": "en-US,en;q=0.9"},
+            )
+            if resp.status_code == 200 and "html" in resp.headers.get("content-type", "html"):
+                return resp.text[:2_000_000]
+            if resp.status_code in (401, 403, 404, 410):
+                return None  # blocked or gone — retrying won't help
+        except requests.RequestException:
+            pass
+        if attempt < attempts:
+            time.sleep(2)
+    return None
+
+
+def _walk_json(node):
+    if isinstance(node, dict):
+        yield node
+        for v in node.values():
+            yield from _walk_json(v)
+    elif isinstance(node, list):
+        for v in node:
+            yield from _walk_json(v)
+
+
+def extract_signals(html, domain):
+    """Measure what the page actually contains."""
+    soup = BeautifulSoup(html, "html.parser")
+
+    schema_types, modified = set(), None
+    for tag in soup.find_all("script", type="application/ld+json"):
+        try:
+            data = json.loads(tag.string or "")
+        except (ValueError, TypeError):
+            continue
+        for node in _walk_json(data):
+            t = node.get("@type")
+            for name in (t if isinstance(t, list) else [t]):
+                if isinstance(name, str):
+                    schema_types.add(name)
+            modified = modified or node.get("dateModified") or node.get("datePublished")
+    for prop in ("article:modified_time", "article:published_time", "og:updated_time"):
+        meta = soup.find("meta", attrs={"property": prop})
+        if meta and meta.get("content"):
+            modified = modified or meta["content"]
+
+    age_days = None
+    if modified:
+        try:
+            when = datetime.datetime.fromisoformat(str(modified)[:10])
+            age_days = (datetime.datetime.now() - when).days
+        except ValueError:
+            pass
+
+    for tag in soup(["script", "style", "noscript", "nav", "footer", "header", "aside", "form"]):
+        tag.decompose()
+    root = soup.find("main") or soup.find("article") or soup.body or soup
+    text = root.get_text(" ", strip=True)
+
+    own = domain.lower().removeprefix("www.")
+    internal = {
+        a["href"].split("#")[0] for a in root.find_all("a", href=True)
+        if a["href"].startswith("/") or own in a["href"].lower()
+    }
+    h1 = soup.find("h1")
+    headings = [h.get_text(" ", strip=True).lower() for h in root.find_all(["h2", "h3"])]
+    lower = text.lower()
+
+    return {
+        "words": len(text.split()),
+        "h2_count": len(root.find_all("h2")),
+        "tables": len(root.find_all("table")),
+        "has_faq": "FAQPage" in schema_types or any("faq" in h or h.endswith("?") for h in headings),
+        "schema": sorted(schema_types & {"FAQPage", "Product", "Article", "BlogPosting", "Review", "AggregateRating", "Organization", "HowTo"}),
+        "internal_links": len(internal),
+        "age_days": age_days,
+        "price_shown": bool(re.search(r"\$\s?\d{2,4}", text)),
+        "guarantee": "guarantee" in lower,
+        "year_in_title": bool(re.search(r"20(25|26)", (soup.title.string or "") if soup.title else "")),
+        "h1": h1.get_text(" ", strip=True) if h1 else "",
+    }
+
+
 def analyze_competitor(competitor, keyword):
-    """Assign threat level and generate specific reason they're winning."""
+    """Fetch the page, measure it, and return (threat, reason, signals).
+
+    Threat comes from a strength score built only from measured signals. If the
+    page can't be read, the result is MEDIUM and says so — never a guessed LOW.
+    """
     domain = competitor.get("domain", "")
     title = competitor.get("title", "")
     url = competitor.get("url", "")
-    rank = competitor.get("rank", 1)
+    domain_label = domain.lower().removeprefix("www.").split(".")[0]
+    exact_match = bool(keyword) and keyword.lower().replace(" ", "") in domain_label
 
-    # High-authority domains
-    high_authority_domains = [
-        "shopify.com", "hubspot.com", "semrush.com", "ahrefs.com", "moz.com",
-        "neil patel", "backlinko", "searchengineland", "searchenginejournal",
-        "make.com", "zapier.com", "hootsuite.com", "buffer.com",
-    ]
+    html = fetch_page(url) if url else None
+    sig = extract_signals(html, domain) if html else None
+    # A near-empty body means a JS-rendered shell, not a thin page — don't score it
+    if sig is not None and sig["words"] < 150:
+        html = None
+    if html is None:
+        return "MEDIUM", (
+            f"Page could not be read (blocked, JS-rendered or unavailable), so depth is unmeasured. "
+            f"Title: \"{title[:80]}\". Review {domain} manually before treating this as a quick win."
+        ), None
 
-    is_high_authority = any(d in domain.lower() for d in high_authority_domains)
-    has_year = "2026" in title or "2025" in title
-    has_comparison = any(w in title.lower() for w in ["vs", "versus", "compare", "best", "top"])
-    has_guide = any(w in title.lower() for w in ["guide", "tutorial", "how to", "steps"])
-    is_brand_result = keyword.lower().split()[0] in domain.lower() if keyword else False
+    strengths, gaps = [], []
+    score = 0
 
-    # Assign threat and reason
-    if is_brand_result:
+    if any(d in domain.lower() for d in HIGH_AUTHORITY_DOMAINS):
+        score += 3
+        strengths.append(f"high-authority domain ({domain})")
+    if exact_match:
+        score += 2
+        strengths.append("exact-match domain")
+    if sig["words"] >= 2500:
+        score += 2
+        strengths.append(f"{sig['words']:,}-word page")
+    elif sig["words"] >= 1200:
+        score += 1
+        strengths.append(f"{sig['words']:,} words")
+    else:
+        gaps.append(f"only {sig['words']:,} words")
+    if sig["tables"]:
+        score += 1
+        strengths.append(f"{sig['tables']} comparison/data table(s)")
+    if sig["has_faq"]:
+        score += 1
+        strengths.append("FAQ section")
+    if sig["schema"]:
+        score += 1
+        strengths.append("schema: " + ", ".join(sig["schema"]))
+    if sig["internal_links"] >= 40:
+        score += 1
+        strengths.append(f"{sig['internal_links']} internal links")
+    if sig["age_days"] is not None and sig["age_days"] <= 180:
+        score += 1
+        strengths.append(f"updated {sig['age_days']} days ago")
+    elif sig["age_days"] is not None and sig["age_days"] > 540:
+        gaps.append(f"last updated {sig['age_days']} days ago")
+    if sig["year_in_title"]:
+        score += 1
+        strengths.append("year in title")
+
+    if score >= 6:
         threat = "HIGH"
-        reason = f"Ranking for their own brand term — not beatable on this exact query. Target a 'best alternatives to {domain}' angle instead."
-    elif is_high_authority:
-        threat = "HIGH"
-        reason = f"Massive domain authority (DR 80+). Hard to displace with content alone — target their gap keywords instead, or go 3x deeper on a specific sub-topic they only skim."
-    elif has_year:
+    elif score >= 3:
         threat = "MEDIUM"
-        reason = f"Published with '{('2026' if '2026' in title else '2025')}' in title/URL — recency signal Google is rewarding. Fix: update your title to include the year and add a 'What's changed' section."
-    elif has_comparison:
-        threat = "MEDIUM"
-        reason = f"Comparison or listicle format above the fold — Google AI Overview pulls from structured tables. Fix: add a comparison table to your post and move it higher up the page."
-    elif has_guide:
-        threat = "MEDIUM"
-        reason = f"Comprehensive guide format with likely strong internal linking. Fix: match the content depth and make sure your post has at least 5 internal links pointing to it."
     else:
         threat = "LOW"
-        reason = f"Appears to be thin content or ranking on coincidence. Beatable with a single focused, well-structured 1,500-word post targeting this query directly."
 
-    return threat, reason
+    if threat == "HIGH":
+        reason = (
+            "Hard to displace: " + "; ".join(strengths[:4]) + ". "
+            "Fix: don't fight the exact query head-on — win a narrower angle "
+            "(reporting dates, order-by deadlines, who a tradeline won't help)."
+        )
+    else:
+        fixes = []
+        if not sig["tables"]:
+            fixes.append("add a comparison table")
+        if not sig["has_faq"]:
+            fixes.append("add an FAQ with FAQPage schema")
+        if sig["words"] < 1500:
+            fixes.append("write a 1,500+ word guide")
+        if sig["age_days"] is None or sig["age_days"] > 365:
+            fixes.append("show a recent 'last updated' date")
+        if not sig["price_shown"]:
+            fixes.append("show pricing/line details before checkout")
+        edge = "; ".join(strengths[:3]) or "no strong structural advantage"
+        weak = "; ".join(gaps[:2])
+        reason = f"Edge: {edge}." + (f" Weak spots: {weak}." if weak else "")
+        reason += " Fix: " + ", ".join(fixes[:3]) + "." if fixes else ""
+    return threat, reason, {**sig, "score": score}
+
+
+def keyword_benchmark(entries):
+    """Average the measured top-result pages so content briefs have a target."""
+    measured = [e["signals"] for e in entries if e.get("signals")]
+    if not measured:
+        return None
+    return {
+        "pages_measured": len(measured),
+        "avg_words": round(sum(m["words"] for m in measured) / len(measured)),
+        "pct_with_table": round(100 * sum(1 for m in measured if m["tables"]) / len(measured)),
+        "pct_with_faq": round(100 * sum(1 for m in measured if m["has_faq"]) / len(measured)),
+        "pct_showing_price": round(100 * sum(1 for m in measured if m["price_shown"]) / len(measured)),
+    }
 
 
 def run_competitor_intel():
@@ -161,6 +345,7 @@ def run_competitor_intel():
     quick_wins = []
     avoid_list = []
     failed_keywords = []
+    benchmarks = {}
 
     for keyword in keywords:
         print(f"  Searching: \"{keyword}\"...")
@@ -174,21 +359,25 @@ def run_competitor_intel():
 
         keyword_results = []
         for comp in competitors:
-            threat, reason = analyze_competitor(comp, keyword)
+            threat, reason, signals = analyze_competitor(comp, keyword)
             entry = {
                 "keyword": keyword,
                 "competitor": comp.get("domain", "unknown"),
                 "url": comp.get("url", ""),
                 "threat": threat,
                 "reason": reason,
+                "signals": signals,
             }
+            time.sleep(1)
             keyword_results.append(entry)
             results.append(entry)
 
-            if threat == "LOW":
+            if threat == "LOW" and signals:
                 quick_wins.append(entry)
             if threat == "HIGH":
                 avoid_list.append({"keyword": keyword, "competitor": comp.get("domain"), "reason": reason})
+
+        benchmarks[keyword] = keyword_benchmark(keyword_results)
 
         # Print summary per keyword
         threats = [r["threat"] for r in keyword_results]
@@ -205,6 +394,7 @@ def run_competitor_intel():
         "date": today,
         "keywords_analyzed": len(keywords) - len(failed_keywords),
         "failed_keywords": failed_keywords,
+        "benchmarks": benchmarks,
         "results": results,
         "quick_wins": quick_wins[:3],
         "avoid_list": avoid_list[:3],
@@ -224,6 +414,14 @@ def run_competitor_intel():
         for r in results:
             threat_emoji = "🔴" if r["threat"] == "HIGH" else "🟡" if r["threat"] == "MEDIUM" else "🟢"
             f.write(f"| {r['keyword']} | {r['competitor']} | {threat_emoji} {r['threat']} | {r['reason']} |\n")
+
+        f.write("\n## Content Benchmarks (measured from top-ranking pages)\n\n")
+        f.write("| Keyword | Pages measured | Avg words | With table | With FAQ | Show price |\n|---|---|---|---|---|---|\n")
+        for kw, b in benchmarks.items():
+            if b:
+                f.write(f"| {kw} | {b['pages_measured']} | {b['avg_words']:,} | {b['pct_with_table']}% | {b['pct_with_faq']}% | {b['pct_showing_price']}% |\n")
+            else:
+                f.write(f"| {kw} | 0 | n/a | n/a | n/a | n/a |\n")
 
         if failed_keywords:
             f.write(f"\n**No data (lookup failed):** {', '.join(failed_keywords)}\n")

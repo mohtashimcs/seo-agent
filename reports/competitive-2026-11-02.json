@@ -1,0 +1,431 @@
+{
+  "date": "2026-11-02",
+  "keywords_analyzed": 7,
+  "failed_keywords": [
+    "tradeline companies"
+  ],
+  "benchmarks": {
+    "buy tradelines": {
+      "pages_measured": 2,
+      "avg_words": 1562,
+      "pct_with_table": 0,
+      "pct_with_faq": 50,
+      "pct_showing_price": 0
+    },
+    "tradelines for sale": {
+      "pages_measured": 1,
+      "avg_words": 705,
+      "pct_with_table": 0,
+      "pct_with_faq": 100,
+      "pct_showing_price": 0
+    },
+    "authorized user tradelines": null,
+    "best tradeline companies": {
+      "pages_measured": 2,
+      "avg_words": 2772,
+      "pct_with_table": 50,
+      "pct_with_faq": 100,
+      "pct_showing_price": 100
+    },
+    "primary tradelines for sale": {
+      "pages_measured": 3,
+      "avg_words": 2574,
+      "pct_with_table": 0,
+      "pct_with_faq": 67,
+      "pct_showing_price": 33
+    },
+    "tradeline for sale": {
+      "pages_measured": 2,
+      "avg_words": 1440,
+      "pct_with_table": 50,
+      "pct_with_faq": 50,
+      "pct_showing_price": 50
+    },
+    "au tradelines": {
+      "pages_measured": 2,
+      "avg_words": 2149,
+      "pct_with_table": 0,
+      "pct_with_faq": 50,
+      "pct_showing_price": 0
+    }
+  },
+  "results": [
+    {
+      "keyword": "buy tradelines",
+      "competitor": "tradelinesupply.com",
+      "url": "https://tradelinesupply.com/resources/",
+      "threat": "LOW",
+      "reason": "Edge: schema: Organization; 41 internal links. Weak spots: only 318 words. Fix: add a comparison table, add an FAQ with FAQPage schema, write a 1,500+ word guide.",
+      "signals": {
+        "words": 318,
+        "h2_count": 12,
+        "tables": 0,
+        "has_faq": false,
+        "schema": [
+          "Organization"
+        ],
+        "internal_links": 41,
+        "age_days": null,
+        "price_shown": false,
+        "guarantee": true,
+        "year_in_title": false,
+        "h1": "TRADELINE RESOURCES",
+        "score": 2
+      }
+    },
+    {
+      "keyword": "buy tradelines",
+      "competitor": "www.nav.com",
+      "url": "https://www.nav.com/business-credit/getting-tradelines-fast/",
+      "threat": "HIGH",
+      "reason": "Hard to displace: high-authority domain (www.nav.com); 2,806-word page; FAQ section; schema: Article, FAQPage, Organization. Fix: don't fight the exact query head-on \u2014 win a narrower angle (reporting dates, order-by deadlines, who a tradeline won't help).",
+      "signals": {
+        "words": 2806,
+        "h2_count": 11,
+        "tables": 0,
+        "has_faq": true,
+        "schema": [
+          "Article",
+          "FAQPage",
+          "Organization"
+        ],
+        "internal_links": 16,
+        "age_days": 287,
+        "price_shown": false,
+        "guarantee": true,
+        "year_in_title": true,
+        "h1": "The fastest ways to add business tradelines and build credit in 2026",
+        "score": 8
+      }
+    },
+    {
+      "keyword": "buy tradelines",
+      "competitor": "tradelineassociates.com",
+      "url": "https://tradelineassociates.com/business-tradelines/",
+      "threat": "MEDIUM",
+      "reason": "Page could not be read (blocked, JS-rendered or unavailable), so depth is unmeasured. Title: \"Business Tradelines That Report to D&B, Experian & Equifax\". Review tradelineassociates.com manually before treating this as a quick win.",
+      "signals": null
+    },
+    {
+      "keyword": "tradelines for sale",
+      "competitor": "tradelines.club",
+      "url": "https://tradelines.club/",
+      "threat": "LOW",
+      "reason": "Edge: FAQ section. Weak spots: only 705 words; last updated 700 days ago. Fix: add a comparison table, write a 1,500+ word guide, show a recent 'last updated' date.",
+      "signals": {
+        "words": 705,
+        "h2_count": 6,
+        "tables": 0,
+        "has_faq": true,
+        "schema": [],
+        "internal_links": 11,
+        "age_days": 700,
+        "price_shown": false,
+        "guarantee": false,
+        "year_in_title": false,
+        "h1": "Boost Your Credit Score FAST!",
+        "score": 1
+      }
+    },
+    {
+      "keyword": "authorized user tradelines",
+      "competitor": "callcreditpro.com",
+      "url": "https://callcreditpro.com/blog/what-are-authorized-user-tradelines-and-how-do-they-work/",
+      "threat": "MEDIUM",
+      "reason": "Page could not be read (blocked, JS-rendered or unavailable), so depth is unmeasured. Title: \"What Are Authorized User Tradelines and How Do They ...\". Review callcreditpro.com manually before treating this as a quick win.",
+      "signals": null
+    },
+    {
+      "keyword": "best tradeline companies",
+      "competitor": "tradelinesupply.com",
+      "url": "https://tradelinesupply.com/pricing/",
+      "threat": "MEDIUM",
+      "reason": "Edge: 1,975 words; FAQ section; schema: Organization. Fix: add a comparison table, show a recent 'last updated' date.",
+      "signals": {
+        "words": 1975,
+        "h2_count": 10,
+        "tables": 0,
+        "has_faq": true,
+        "schema": [
+          "Organization"
+        ],
+        "internal_links": 30,
+        "age_days": null,
+        "price_shown": true,
+        "guarantee": true,
+        "year_in_title": false,
+        "h1": "TRADELINE PRICING",
+        "score": 3
+      }
+    },
+    {
+      "keyword": "best tradeline companies",
+      "competitor": "www.arrofinance.com",
+      "url": "https://www.arrofinance.com/blog/build-your-credit-score",
+      "threat": "MEDIUM",
+      "reason": "Edge: 3,569-word page; 2 comparison/data table(s); FAQ section. Fix: show a recent 'last updated' date.",
+      "signals": {
+        "words": 3569,
+        "h2_count": 9,
+        "tables": 2,
+        "has_faq": true,
+        "schema": [],
+        "internal_links": 3,
+        "age_days": null,
+        "price_shown": true,
+        "guarantee": true,
+        "year_in_title": false,
+        "h1": "Best Tradelines To Build Your Credit Score And The Scams To Avoid",
+        "score": 4
+      }
+    },
+    {
+      "keyword": "primary tradelines for sale",
+      "competitor": "www.nav.com",
+      "url": "https://www.nav.com/business-credit/tradelines-for-sale/",
+      "threat": "HIGH",
+      "reason": "Hard to displace: high-authority domain (www.nav.com); 2,590-word page; FAQ section; schema: Article, Organization. Fix: don't fight the exact query head-on \u2014 win a narrower angle (reporting dates, order-by deadlines, who a tradeline won't help).",
+      "signals": {
+        "words": 2590,
+        "h2_count": 12,
+        "tables": 0,
+        "has_faq": true,
+        "schema": [
+          "Article",
+          "Organization"
+        ],
+        "internal_links": 18,
+        "age_days": 565,
+        "price_shown": false,
+        "guarantee": true,
+        "year_in_title": false,
+        "h1": "Tradelines for sale: Is it a best practice or fake shortcut?",
+        "score": 7
+      }
+    },
+    {
+      "keyword": "primary tradelines for sale",
+      "competitor": "boostcredit101.com",
+      "url": "https://boostcredit101.com/tradelines",
+      "threat": "LOW",
+      "reason": "Edge: 2,841-word page. Fix: add a comparison table, add an FAQ with FAQPage schema, show a recent 'last updated' date.",
+      "signals": {
+        "words": 2841,
+        "h2_count": 0,
+        "tables": 0,
+        "has_faq": false,
+        "schema": [],
+        "internal_links": 1,
+        "age_days": null,
+        "price_shown": true,
+        "guarantee": false,
+        "year_in_title": false,
+        "h1": "Browse Available Tradelines",
+        "score": 2
+      }
+    },
+    {
+      "keyword": "primary tradelines for sale",
+      "competitor": "pr.franklintownnews.com",
+      "url": "https://pr.franklintownnews.com/article/Buying-Primary-Tradelines-For-Sale-Coast-Tradelines/66de7e13b437a20008dfc744",
+      "threat": "LOW",
+      "reason": "Edge: 2,291 words; FAQ section. Fix: add a comparison table, show a recent 'last updated' date, show pricing/line details before checkout.",
+      "signals": {
+        "words": 2291,
+        "h2_count": 9,
+        "tables": 0,
+        "has_faq": true,
+        "schema": [],
+        "internal_links": 0,
+        "age_days": null,
+        "price_shown": false,
+        "guarantee": false,
+        "year_in_title": false,
+        "h1": "Buying Primary Tradelines For Sale -Coast Tradelines",
+        "score": 2
+      }
+    },
+    {
+      "keyword": "tradeline for sale",
+      "competitor": "tradelinesupply.com",
+      "url": "https://tradelinesupply.com/page/what-is-a-tradeline/",
+      "threat": "MEDIUM",
+      "reason": "Edge: 1,488 words; FAQ section; schema: Organization. Fix: add a comparison table, write a 1,500+ word guide, show a recent 'last updated' date.",
+      "signals": {
+        "words": 1488,
+        "h2_count": 10,
+        "tables": 0,
+        "has_faq": true,
+        "schema": [
+          "Organization"
+        ],
+        "internal_links": 65,
+        "age_days": null,
+        "price_shown": false,
+        "guarantee": true,
+        "year_in_title": false,
+        "h1": "What Is a Tradeline?",
+        "score": 4
+      }
+    },
+    {
+      "keyword": "tradeline for sale",
+      "competitor": "tradelineexpress.co",
+      "url": "https://tradelineexpress.co/buy-tradelines/chase-tradeline-16500-seasoned-tradelines-for-sale/",
+      "threat": "MEDIUM",
+      "reason": "Edge: 1,393 words; 1 comparison/data table(s); schema: Organization, Product. Fix: add an FAQ with FAQPage schema, write a 1,500+ word guide.",
+      "signals": {
+        "words": 1393,
+        "h2_count": 4,
+        "tables": 1,
+        "has_faq": false,
+        "schema": [
+          "Organization",
+          "Product"
+        ],
+        "internal_links": 3,
+        "age_days": 18,
+        "price_shown": true,
+        "guarantee": true,
+        "year_in_title": false,
+        "h1": "Chase Tradeline $16,500 Seasoned Tradelines for Sale",
+        "score": 4
+      }
+    },
+    {
+      "keyword": "tradeline for sale",
+      "competitor": "dealstream.com",
+      "url": "https://dealstream.com/d/services/consulting/dck5sm",
+      "threat": "MEDIUM",
+      "reason": "Page could not be read (blocked, JS-rendered or unavailable), so depth is unmeasured. Title: \"For Sale: Business Tradelines Up To $500K - Fast Reporting\". Review dealstream.com manually before treating this as a quick win.",
+      "signals": null
+    },
+    {
+      "keyword": "au tradelines",
+      "competitor": "tradelinesupply.com",
+      "url": "https://tradelinesupply.com/blog/buying-primary-tradelines/",
+      "threat": "MEDIUM",
+      "reason": "Edge: 3,247-word page; FAQ section; schema: BlogPosting, Organization. Weak spots: last updated 1188 days ago. Fix: add a comparison table, show a recent 'last updated' date, show pricing/line details before checkout.",
+      "signals": {
+        "words": 3247,
+        "h2_count": 14,
+        "tables": 0,
+        "has_faq": true,
+        "schema": [
+          "BlogPosting",
+          "Organization"
+        ],
+        "internal_links": 81,
+        "age_days": 1188,
+        "price_shown": false,
+        "guarantee": true,
+        "year_in_title": false,
+        "h1": "Buying Primary Tradelines: Fact, Fiction, or Fraud?",
+        "score": 5
+      }
+    },
+    {
+      "keyword": "au tradelines",
+      "competitor": "superiortradelines.com",
+      "url": "https://superiortradelines.com/uncategorized/how-to-choose-the-right-tradeline-for-your-unique-credit-profile/",
+      "threat": "LOW",
+      "reason": "Edge: schema: BlogPosting, Organization. Weak spots: only 1,051 words. Fix: add a comparison table, add an FAQ with FAQPage schema, write a 1,500+ word guide.",
+      "signals": {
+        "words": 1051,
+        "h2_count": 3,
+        "tables": 0,
+        "has_faq": false,
+        "schema": [
+          "BlogPosting",
+          "Organization"
+        ],
+        "internal_links": 24,
+        "age_days": 196,
+        "price_shown": false,
+        "guarantee": false,
+        "year_in_title": false,
+        "h1": "",
+        "score": 1
+      }
+    }
+  ],
+  "quick_wins": [
+    {
+      "keyword": "buy tradelines",
+      "competitor": "tradelinesupply.com",
+      "url": "https://tradelinesupply.com/resources/",
+      "threat": "LOW",
+      "reason": "Edge: schema: Organization; 41 internal links. Weak spots: only 318 words. Fix: add a comparison table, add an FAQ with FAQPage schema, write a 1,500+ word guide.",
+      "signals": {
+        "words": 318,
+        "h2_count": 12,
+        "tables": 0,
+        "has_faq": false,
+        "schema": [
+          "Organization"
+        ],
+        "internal_links": 41,
+        "age_days": null,
+        "price_shown": false,
+        "guarantee": true,
+        "year_in_title": false,
+        "h1": "TRADELINE RESOURCES",
+        "score": 2
+      }
+    },
+    {
+      "keyword": "tradelines for sale",
+      "competitor": "tradelines.club",
+      "url": "https://tradelines.club/",
+      "threat": "LOW",
+      "reason": "Edge: FAQ section. Weak spots: only 705 words; last updated 700 days ago. Fix: add a comparison table, write a 1,500+ word guide, show a recent 'last updated' date.",
+      "signals": {
+        "words": 705,
+        "h2_count": 6,
+        "tables": 0,
+        "has_faq": true,
+        "schema": [],
+        "internal_links": 11,
+        "age_days": 700,
+        "price_shown": false,
+        "guarantee": false,
+        "year_in_title": false,
+        "h1": "Boost Your Credit Score FAST!",
+        "score": 1
+      }
+    },
+    {
+      "keyword": "primary tradelines for sale",
+      "competitor": "boostcredit101.com",
+      "url": "https://boostcredit101.com/tradelines",
+      "threat": "LOW",
+      "reason": "Edge: 2,841-word page. Fix: add a comparison table, add an FAQ with FAQPage schema, show a recent 'last updated' date.",
+      "signals": {
+        "words": 2841,
+        "h2_count": 0,
+        "tables": 0,
+        "has_faq": false,
+        "schema": [],
+        "internal_links": 1,
+        "age_days": null,
+        "price_shown": true,
+        "guarantee": false,
+        "year_in_title": false,
+        "h1": "Browse Available Tradelines",
+        "score": 2
+      }
+    }
+  ],
+  "avoid_list": [
+    {
+      "keyword": "buy tradelines",
+      "competitor": "www.nav.com",
+      "reason": "Hard to displace: high-authority domain (www.nav.com); 2,806-word page; FAQ section; schema: Article, FAQPage, Organization. Fix: don't fight the exact query head-on \u2014 win a narrower angle (reporting dates, order-by deadlines, who a tradeline won't help)."
+    },
+    {
+      "keyword": "primary tradelines for sale",
+      "competitor": "www.nav.com",
+      "reason": "Hard to displace: high-authority domain (www.nav.com); 2,590-word page; FAQ section; schema: Article, Organization. Fix: don't fight the exact query head-on \u2014 win a narrower angle (reporting dates, order-by deadlines, who a tradeline won't help)."
+    }
+  ]
+}
